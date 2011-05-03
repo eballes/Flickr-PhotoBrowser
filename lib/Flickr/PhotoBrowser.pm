@@ -32,6 +32,39 @@ sub _getValues {
     return;
 }
 
+sub _retrieveID { 
+    my ( $self, $name, $type ) = @_;
+    croak "OO use required\n"
+      if ( ref $self ) ne "Flickr::PhotoBrowser";
+    croak "Invalid type: $type != 'collection'|'set'"
+      unless $type eq 'collection' || $type eq 'set';
+    
+    my $response =
+      $self->{api}->execute_method( 'flickr.collections.getTree',
+        { user_id => $self->{nsid} } );
+
+    foreach my $field ( @{ $response->{tree}{children} } ) {
+        next unless $field->{name} && $field->{name} eq 'collections';
+        foreach my $collection ( @{ $field->{children} } ) {
+            next
+              unless $collection->{name}
+                  && $collection->{name} eq 'collection';
+
+            if ($type eq 'collection') {
+                next unless $collection->{attributes}{title} eq $name;
+                return $collection->{attributes}{id};
+            } else {
+                foreach my $set ( @{ $collection->{children} } ) {
+                    next unless $set->{name} && $set->{name} eq 'set';
+                    next unless $set->{attributes}{title} eq $name;
+                    return $set->{attributes}{id};
+                }
+            } 
+        }
+    }
+    return;
+}
+
 sub new {
     my ( $class, $options ) = @_;
     my $api = new Flickr::API(
@@ -203,16 +236,21 @@ sub getPicturesOfSet {
     }
 }
 
-__END__
-### TMP TESTS ###
-my $fpb = Flickr::PhotoBrowser->new();
-my $res = $fpb->login();
-print "User: $res->{user} Nsid: $res->{nsid} Token: $res->{token}\n";
+sub retrieveSetID {
+    my ( $self, $name ) = @_;
+    croak "OO use required\n"
+      if ( ref $self ) ne "Flickr::PhotoBrowser";
 
-#print Dumper($fpb->getCollections($res->{nsid}));
-#print Dumper($fpb->getCollections($res->{nsid}, '3641781-72157625104011405'));
-#print Dumper($fpb->getSetsOfCollections($res->{nsid}, '3641781-72157606006060144'));
-#print Dumper($fpb->getSetsOfCollections($res->{nsid}, '3641781-72157625104011405'));
-#print Dumper($fpb->getCollections($res->{nsid}, '3641781-72157606006060144'));
-#print Dumper($fpb->getPicturesOfSet('72157625376425032', 'url_o', 1, []));
-#print Dumper($fpb->getPicturesOfSet($res->{token}, '72157603530249047', 'url_o', 1, []));
+    return $self->_retrieveID($name, 'set');
+}
+
+sub retrieveCollectionID {
+    my ( $self, $name ) = @_;
+    croak "OO use required\n"
+      if ( ref $self ) ne "Flickr::PhotoBrowser";
+
+    return $self->_retrieveID($name, 'collection');
+}
+
+1;
+
