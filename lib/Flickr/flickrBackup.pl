@@ -58,7 +58,7 @@ sub backupSet {
 
     my $path = "$basePath/$safeTitle";
     print "Mkdir:$path\n";
-    mkdir $path;
+    mkdir $path unless -e $path;
 
     my @photos = @{ $fpb->getPicturesOfSet( $set->{id}, $size, 1, [] ) };
     foreach my $photo (@photos) {
@@ -76,7 +76,7 @@ sub backupCollection {
 
     my $path = "$basePath/$safeTitle";
     print "Mkdir:$path\n";
-    mkdir $path;
+    mkdir $path unless -e $path;
 
     foreach my $element ( @{ $fpb->getCollections( $collection->{id} ) } ) {
         backupCollection( $fpb, $path, $element, $size );
@@ -89,13 +89,11 @@ sub backupCollection {
 }
 
 sub flickrBackup {
-    my ( $path, $size ) = @_;
+    my ( $path, $size, $options ) = @_;
+    my $clean     = $options->{clean};
+    my $albumName = $options->{name};
 
-    # Temporal
-    -e $path
-      ? remove_tree($path) && mkdir $path
-      : mkdir $path;
-    ###
+    remove_tree($path) && mkdir $path if -e $path && $clean;
 
     my $fpb = Flickr::PhotoBrowser->new(
         {
@@ -106,21 +104,48 @@ sub flickrBackup {
     logApp($fpb);
     print Dumper($fpb);
 
-    foreach my $collection ( @{ $fpb->getCollections() } ) {
-        backupCollection( $fpb, $path, $collection, $size );
+    my ( $colId, $setId );
+    if ($albumName) {
+        $colId = $fpb->retrieveCollectionID($albumName);
+        $setId = $fpb->retrieveSetID($albumName);
+
+        print "ColId: $colId  SetId: $setId\n";
+
+        if ( !$colId xor $setId ) {
+            carp "Ambiguous name... matches with set and collection.\n"
+              . "Retrieving collection by default";
+            $setId = undef;
+        }
+    }
+
+    if ( !( $colId || $setId ) ) {
+        foreach my $collection ( @{ $fpb->getCollections() } ) {
+            backupCollection( $fpb, $path, $collection, $size );
+        }
+    }
+    else {
+        if ($colId) {
+            backupCollection( $fpb, $path,
+                { id => $colId, title => $albumName }, $size );
+        }
+        else {
+            backupSet( $fpb, $path, 
+                { id => $setId, title => $albumName }, $size );
+        }
     }
 }
 
 ######################### MAIN ########################################
 sub help {
-    print "\n./", basename($0), " -s <station> [-v]", "\n\n";
-
+    print "\n", basename($0), "\n", <DATA> and exit;
 }
 
 sub main {
     GetOptions(
         'path|p=s' => \( my $backupPath = undef ),
+        'name|n=s' => \( my $albumName  = undef ),
         'size|s=s' => \( my $size       = 'url_t' ),
+        'clean|c'  => \( my $cleanExec  = undef ),
         'help|h'   => \( my $printHelp  = undef ),
     );
 
@@ -130,8 +155,16 @@ sub main {
     help() unless $backupPath;
     help() unless $size =~ /url_(:?[tsmo]|sq)/;
 
-    flickrBackup( $backupPath, $size );
+    flickrBackup( $backupPath, $size,
+        { name => $albumName, clean => $cleanExec } );
 }
 
 main();
+
+__DATA__
+
+
+
+
+
 
