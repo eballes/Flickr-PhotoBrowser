@@ -23,6 +23,7 @@ sub logApp {
     my ($pb) = @_;
     my $token;
 
+    # Get token from file
     if ( -e $ENV{HOME} . "/.FlickrBackup" ) {
         open my $fd, '<', $ENV{HOME} . "/.FlickrBackup";
         $token = scalar <$fd>;
@@ -54,10 +55,9 @@ sub backupSet {
     my ( $fpb, $basePath, $set, $size ) = @_;
 
     ( my $safeTitle = $set->{title} ) =~ s/[\(\)\'\/]//g;
-    print "SafeTitle: $safeTitle\n";
 
     my $path = "$basePath/$safeTitle";
-    print "Mkdir:$path\n";
+    print "Creating... $path\n";
     mkdir $path unless -e $path;
 
     my @photos = @{ $fpb->getPicturesOfSet( $set->{id}, $size, 1, [] ) };
@@ -75,7 +75,7 @@ sub backupCollection {
     print "SafeTitle:$safeTitle\n";
 
     my $path = "$basePath/$safeTitle";
-    print "Mkdir:$path\n";
+    print "Creating... $path\n";
     mkdir $path unless -e $path;
 
     foreach my $element ( @{ $fpb->getCollections( $collection->{id} ) } ) {
@@ -102,7 +102,6 @@ sub flickrBackup {
         }
     );
     logApp($fpb);
-    print Dumper($fpb);
 
     my ( $colId, $setId );
     if ($albumName) {
@@ -129,15 +128,24 @@ sub flickrBackup {
                 { id => $colId, title => $albumName }, $size );
         }
         else {
-            backupSet( $fpb, $path, 
-                { id => $setId, title => $albumName }, $size );
+            backupSet( $fpb, $path, { id => $setId, title => $albumName },
+                $size );
         }
     }
 }
 
 ######################### MAIN ########################################
 sub help {
-    print "\n", basename($0), "\n", <DATA> and exit;
+    print "\n", basename($0), <<EOF;
+ -p <output_path> [ --name <collection/set name>] [--clean] [--size <size>] [-h]
+
+Clean flag removes all the content in <output_path> before starting to
+download any photo. 
+
+Possible size values: url_t url_s url_m url_o url_sq
+
+EOF
+    exit;
 }
 
 sub main {
@@ -161,10 +169,93 @@ sub main {
 
 main();
 
-__DATA__
+__END__
 
+=head1 NAME
 
+flickrBackup - Download your photos from C<flickr.com>
 
+=head1 SYNOPSIS
 
+flickrBackup --path <output_path> [ --name <collection/set name>] 
+    [--clean] [--size <size>] [-h]
 
+=head1 DESCRIPTION
+
+Batch image dowloader for the L<Flickr.com> service.
+
+L<flickrBackup> makes easy to perform backups of sets and 
+collections from Flickr.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --path
+
+The C<--path> option indicates L<flickrBackup> where to store the
+backup. This argument is mandatory.
+
+=item --name
+
+The C<--name> option asks L<flickrBackup> to do a partial backup of a 
+particular collection or set. If a collection and a set share the same
+name, the collection is dowloaded.
+
+=item --size
+
+The C<--size> option tells L<flickrBackup> which size of the photos is
+preferred for the backup. Options are:
+  url_sq  - Square size
+  url_t   - Thumbnail size
+  url_s   - Small size
+  url_m   - Medium size
+  url_o   - Original size
+
+=item --clean
+
+The C<--clean> flag indicates L<flickrBackup> to erase the output
+path passed by the C<--path> option. If this flag is not activated,
+a backup can be resumed.
+
+Warn: Just be careful. "Resume" means that the program is not downloading
+a file if it's already present e.g. no checks are made to consider if the
+size of the file present locally is the requested one.
+
+=item -h
+
+The C<-h> flag prints the help
+
+=back
+
+=head1 CONFIGURATION
+
+A configuration file to store the application token is created the
+first time the application is executed. 
+
+  ~/.FlickrBackup
+
+=head1 BUGS
+
+Error handling could be better.
+
+Resume or incremental download can be considerably improved
+
+=head1 AUTHOR
+
+Eduardo Ballesteros, L<eebr@cpan.org>.
+
+=head1 SEE ALSO
+
+L<flickr.com>
+
+L<Flickr::Upload>
+
+L<Net::Flickr::Backup>
+
+L<http://flickr.com/services/api/>
+
+L<http://www.flickr.com/help/filters/>
+
+=cut
 
