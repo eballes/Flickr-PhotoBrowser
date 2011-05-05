@@ -32,6 +32,7 @@ sub logApp {
         $token = $pb->checkToken($token);
     }
 
+    print "Token: $token\n";
     my $loginResult = $pb->login( { token => $token } );
 
     if ( $loginResult->{token} ) {
@@ -41,11 +42,11 @@ sub logApp {
         chomp( my $browser = `which firefox` || `which google-chrome` );
         system( $browser, $loginResult->{uri} );
         print "Go to\n-> $loginResult->{uri}\n";
-        print "and grant read access to PhotoBroser\n";
+        print "and grant read access to FlickrBackup\n";
         print "Press enter to continue when finished.\n";
         getc;
 
-        $token = $pb->login( { frob => $loginResult->{frob} } );
+        $token = $pb->login( { frob => $loginResult->{frob} } )->{token};
     }
 
     open my $fd, '>', $ENV{HOME} . '/.FlickrBackup';
@@ -68,7 +69,8 @@ sub url2file {
 sub backupSet {
     my ( $fpb, $basePath, $set, $size ) = @_;
 
-    ( my $safeTitle = $set->{title} ) =~ s/[\(\)\'\/]//g;
+    ( my $safeTitle = $set->{title} ) =~ s/([\(\)\'\s])/\\$1/g;
+    $safeTitle =~ s/\//-/g;
 
     my $path = "$basePath/$safeTitle";
     print "Creating... $path\n";
@@ -85,8 +87,8 @@ sub backupSet {
 sub backupCollection {
     my ( $fpb, $basePath, $collection, $size ) = @_;
 
-    ( my $safeTitle = $collection->{title} ) =~ s/[\(\)\'\/]//g;
-    print "SafeTitle:$safeTitle\n";
+    ( my $safeTitle = $collection->{title} ) =~ s/([\(\)\'\s])/\\$1/g;
+    $safeTitle =~ s/\//-/g;
 
     my $path = "$basePath/$safeTitle";
     print "Creating... $path\n";

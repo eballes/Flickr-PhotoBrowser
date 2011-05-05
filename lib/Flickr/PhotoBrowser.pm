@@ -123,7 +123,7 @@ sub login {
       $self->{api}
       ->execute_method( 'flickr.auth.checkToken', { auth_token => $token } );
 
-    if ( $response->{attributes}{stat} eq 'ok' ) {
+    if ( $response->{tree}{attributes}{stat} eq 'ok' ) {
         my ( $user, $nsid ) = _getValues(
             $response->{tree},
             [ 'auth',     'user' ],
