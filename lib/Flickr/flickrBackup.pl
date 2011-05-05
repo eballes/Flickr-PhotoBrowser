@@ -32,7 +32,21 @@ sub logApp {
         $token = $pb->checkToken($token);
     }
 
-    $token = $pb->login($token);
+    my $loginResult = $pb->login( { token => $token } );
+
+    if ( $loginResult->{token} ) {
+        $token = $loginResult->{token};
+    }
+    elsif ( $loginResult->{uri} && $loginResult->{frob} ) {
+        chomp( my $browser = `which firefox` || `which google-chrome` );
+        system( $browser, $loginResult->{uri} );
+        print "Go to\n-> $loginResult->{uri}\n";
+        print "and grant read access to PhotoBroser\n";
+        print "Press enter to continue when finished.\n";
+        getc;
+
+        $token = $pb->login( { frob => $loginResult->{frob} } );
+    }
 
     open my $fd, '>', $ENV{HOME} . '/.FlickrBackup';
     print $fd $token;
