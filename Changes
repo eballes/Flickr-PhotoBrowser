@@ -1,0 +1,114 @@
+commit b4fbb2613539bea55f1741785ae83f11dbce9b2b (HEAD, master)
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Fri May 6 13:57:44 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Fri May 6 13:57:44 2011 +0200
+
+    Deleted README
+
+commit c03d66d9b6f0857ae945e01c306795d0199c5206
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Fri May 6 13:56:59 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Fri May 6 13:56:59 2011 +0200
+
+    Functional Makefile.PL
+
+commit 57e0b92e2502d835d4a006b32dd42ff942606451
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Fri May 6 11:01:56 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Fri May 6 11:01:56 2011 +0200
+
+    Info
+
+commit 6389fbfa1ff61115149651842803056acd767fbf (origin/master)
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Thu May 5 16:00:16 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Thu May 5 16:00:16 2011 +0200
+
+    Fixed login & token issue.
+    Improved character handling for bash.
+
+commit e1cccfd6ff3383a02f270c76b2df26e9808622f7
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Thu May 5 14:10:02 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Thu May 5 14:10:02 2011 +0200
+
+    Some robustness in login process
+
+commit e4e68854c1b9d6ab2571057dc90c3702d75a2840
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Thu May 5 14:09:26 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Thu May 5 14:09:26 2011 +0200
+
+    Doc && Extra robustness at login()
+
+commit e68e5b1e3da7885a328aa16cdfb0a6a2976e152c
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Wed May 4 17:05:03 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Wed May 4 17:05:03 2011 +0200
+
+    Perldoc added
+
+commit b3e83b2b45c1b2655b10f1da1543bc528835bd97
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Tue May 3 17:09:57 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Tue May 3 17:09:57 2011 +0200
+
+    Makefile.PL initial commit
+
+commit 07275fbab50ae898ea2e3ad83801b492e88127b0
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Tue May 3 14:19:12 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Tue May 3 14:19:12 2011 +0200
+
+    Some functions added:
+     - Incremental download vs clean download
+     - Selectively download a set or a collection
+
+commit 982cc28582e1e6712400f613c086d488a29125d3
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Tue May 3 14:18:10 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Tue May 3 14:18:10 2011 +0200
+
+    Added retrieveID functions for sets and collections
+
+commit 9cc5a9acd9d752a8e641e05884c4c5742b844b92
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Mon May 2 15:44:12 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Mon May 2 15:44:12 2011 +0200
+
+    First functional version.
+
+commit 02006bff50fb2fe88d8de09494f40987342a1076
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Mon May 2 15:42:57 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Mon May 2 15:42:57 2011 +0200
+
+    Library and interfaced "shaped"
+
+commit ee4fd2ca1fc33794dcc7bc760ce20e18dbd39f52
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Sat Apr 30 14:53:44 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Sat Apr 30 14:53:44 2011 +0200
+
+    Library "shaped" and main program
+
+commit ed5d9be3e020b425afa98965a40b62dce1e49af9
+Author:     eballes <eballes@gmail.com>
+AuthorDate: Fri Apr 29 22:23:22 2011 +0200
+Commit:     eballes <eballes@gmail.com>
+CommitDate: Fri Apr 29 22:23:22 2011 +0200
+
+    First commit
