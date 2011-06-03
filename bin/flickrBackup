@@ -11,7 +11,7 @@ use File::Basename;
 use File::Path qw(remove_tree);
 use LWP::Simple;
 
-use PhotoBrowser;
+use Flicker::PhotoBrowser;
 
 # Key:
 #  e5df46b2cf8cfe59f58df245ec09c9d4
