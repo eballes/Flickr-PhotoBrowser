@@ -1,4 +1,3 @@
-
 =head1 NAME
 
 flickrBackup - Download your photos from C<flickr.com>
@@ -10,7 +9,7 @@ flickrBackup --path <output_path> [ --name <collection/set name>]
 
 =head1 DESCRIPTION
 
-Batch image dowloader for the L<Flickr.com> service.
+Batch image dowloader for the Flickr.com service.
 
 L<flickrBackup> makes easy to perform backups of sets and 
 collections from Flickr.
@@ -21,18 +20,18 @@ collections from Flickr.
 
 =item --path
 
-The C<--path> option indicates L<flickrBackup> where to store the
+The C<--path> option indicates flickrBackup where to store the
 backup. This argument is mandatory.
 
 =item --name
 
-The C<--name> option asks L<flickrBackup> to do a partial backup of a 
+The C<--name> option asks flickrBackup to do a partial backup of a 
 particular collection or set. If a collection and a set share the same
 name, the collection is dowloaded.
 
 =item --size
 
-The C<--size> option tells L<flickrBackup> which size of the photos is
+The C<--size> option tells flickrBackup which size of the photos is
 preferred for the backup. Options are:
   url_sq  - Square size
   url_t   - Thumbnail size
@@ -42,7 +41,7 @@ preferred for the backup. Options are:
 
 =item --clean
 
-The C<--clean> flag indicates L<flickrBackup> to erase the output
+The C<--clean> flag indicates flickrBackup to erase the output
 path passed by the C<--path> option. If this flag is not activated,
 a backup can be resumed.
 
@@ -71,7 +70,7 @@ Resume or incremental download can be considerably improved
 
 =head1 AUTHOR
 
-Eduardo Ballesteros, L<eebr@cpan.org>.
+Eduardo Ballesteros, L<eballes [_AT_] gmail [_DOT_] com>.
 
 =head1 SEE ALSO
 
