@@ -25,7 +25,7 @@ WriteMakefile(
         'Getopt::Long'   => 1,
         'Flickr::API'    => 0.07
     },
-    'EXE_FILES' => ['lib/Flickr/flickrBackup.pl'],
+    'EXE_FILES' => ['bin/flickrBackup'],
     'clean'     => { FILES => 'ChangeLog META.yml' },
     'depend'    => { 'create_distdir' => 'ChangeLog  META.yml' },
 );
