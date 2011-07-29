@@ -396,9 +396,10 @@ sub retrieveCollectionID {
 
 =over 4
 
-$id = $fpb->isTheWantedSize($currentSize, $wishedSize);
+$id = $fpb->isTheWantedSize($currentDimensions, $wishedSize);
 
- Requires: Current image height and flickr url_size of desired photo
+ Requires: Current image dimensions (array ref to height and width)
+    and flickr url_size of desired photo
  Returns: Boolean
 
 =back
