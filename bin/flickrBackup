@@ -10,6 +10,7 @@ use Getopt::Long;
 use File::Basename;
 use File::Path qw(remove_tree);
 use LWP::Simple;
+use Image::Size;
 
 use Flickr::PhotoBrowser;
 
@@ -40,7 +41,7 @@ sub logApp {
     }
     elsif ( $loginResult->{uri} && $loginResult->{frob} ) {
         chomp( my $browser = `which firefox` || `which google-chrome` );
-        system( $browser, $loginResult->{uri} );
+        system( $browser, $loginResult->{uri} ) if $browser;
         print "Go to\n-> $loginResult->{uri}\n";
         print "and grant read access to FlickrBackup\n";
         print "Press enter to continue when finished.\n";
@@ -57,11 +58,16 @@ sub logApp {
 }
 
 sub url2file {
-    my ( $flickrPhoto, $path ) = @_;
+    my ( $fpb, $flickrPhoto, $path, $size ) = @_;
     my ($extension) = $flickrPhoto->{url} =~ /\.(.{3,4}$)/;
-    LWP::Simple::getstore( $flickrPhoto->{url},
-        "$path/$flickrPhoto->{title}.$extension" )
-      unless -e "$path/$flickrPhoto->{title}.$extension";
+
+    my ( $h, $w, $err ) = imgsize("$path/$flickrPhoto->{title}.$extension");
+    if (   !-e "$path/$flickrPhoto->{title}.$extension"
+        || !$fpb->isTheWantedSize( [ $h, $w ], $size ) )
+    {
+        LWP::Simple::getstore( $flickrPhoto->{url},
+            "$path/$flickrPhoto->{title}.$extension" );
+    } else { print "Skip download $flickrPhoto->{title}.$extension\n"}
 
     return;
 }
@@ -79,7 +85,7 @@ sub backupSet {
     my @photos = @{ $fpb->getPicturesOfSet( $set->{id}, $size, 1, [] ) };
     foreach my $photo (@photos) {
         print "\tGetting photo... $photo->{title}\n";
-        url2file( $photo, $path );
+        url2file( $fpb, $photo, $path, $size );
     }
     return;
 }
@@ -124,9 +130,12 @@ sub flickrBackup {
         $colId = $fpb->retrieveCollectionID($albumName);
         $setId = $fpb->retrieveSetID($albumName);
 
-        print "ColId: $colId  SetId: $setId\n";
+        print "Album Query: $albumName ColId: $colId  SetId: $setId\n";
 
-        if ( !$colId xor $setId ) {
+        if ( !$colId and !$setId ) {
+            croak "Nothing found :(";
+        }
+        if ( $colId and $setId ) {
             carp "Ambiguous name... matches with set and collection.\n"
               . "Retrieving collection by default";
             $setId = undef;
@@ -173,11 +182,11 @@ sub main {
         'help|h'   => \( my $printHelp  = undef ),
     );
 
-    #url_sq, url_t, url_s, url_m, url_o
+    #url_sq, url_t, url_s, url_m, url_z, url_l, url_o
 
     help() if $printHelp;
     help() unless $backupPath;
-    help() unless $size =~ /url_(:?[tsmo]|sq)/;
+    help() unless $size =~ /url_(:?[tsmozl]|sq)/;
 
     flickrBackup( $backupPath, $size,
         { name => $albumName, clean => $cleanExec } );
@@ -226,6 +235,8 @@ preferred for the backup. Options are:
   url_t   - Thumbnail size
   url_s   - Small size
   url_m   - Medium size
+  url_z   - Medium 640
+  url_l   - Large size
   url_o   - Original size
 
 =item --clean
