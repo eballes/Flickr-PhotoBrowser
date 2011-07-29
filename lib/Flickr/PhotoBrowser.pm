@@ -7,8 +7,9 @@ use autodie;
 use Carp;
 use Data::Dumper;
 use Flickr::API;
+use List::MoreUtils qw{any all};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -389,6 +390,44 @@ sub retrieveCollectionID {
     return $self->_retrieveID( $name, 'collection' );
 }
 
+#-------------------------------------
+
+=head2 isTheWantedSize
+
+=over 4
+
+$id = $fpb->isTheWantedSize($currentSize, $wishedSize);
+
+ Requires: Current image height and flickr url_size of desired photo
+ Returns: Boolean
+
+=back
+
+=cut
+
+sub isTheWantedSize {
+    my ( $self, $currentDimensions, $wishedSize ) = @_;
+    croak "OO use required\n"
+      if ( ref $self ) ne "Flickr::PhotoBrowser";
+    my %dimensionMatrix = (
+        url_sq => 75,
+        url_t  => 100,
+        url_s  => 240,
+        url_m  => 500,
+        url_z  => 640,
+        url_l  => 1024,
+        url_o  => 1024,
+    );
+
+    if ( $wishedSize eq 'url_o' ) {
+        return all { $_ > $dimensionMatrix{$wishedSize} } @$currentDimensions;
+    }
+    else {
+        return any { $_ == $dimensionMatrix{$wishedSize} } @$currentDimensions;
+    }
+    return;
+}
+
 =head1 PRIVATE METHODS
 
 =head2 _getValues
@@ -409,7 +448,6 @@ that element
 =back
 
 =cut
-
 
 sub _getValues {
     my ( $tree, $elements, $attr ) = @_;
@@ -447,15 +485,16 @@ $id = $fpb->_retrieveID($name, $type);
 =cut
 
 sub _retrieveID {
-    my ( $self, $name, $type ) = @_;
+    my ( $self, $name, $type, $col_id ) = @_;
     croak "OO use required\n"
       if ( ref $self ) ne "Flickr::PhotoBrowser";
     croak "Invalid type: $type != 'collection'|'set'"
       unless $type eq 'collection' || $type eq 'set';
 
+    $col_id = 0 unless $col_id;
     my $response =
       $self->{api}->execute_method( 'flickr.collections.getTree',
-        { user_id => $self->{nsid} } );
+        { user_id => $self->{nsid}, collection_id => $col_id } );
 
     foreach my $field ( @{ $response->{tree}{children} } ) {
         next unless $field->{name} && $field->{name} eq 'collections';
@@ -465,14 +504,36 @@ sub _retrieveID {
                   && $collection->{name} eq 'collection';
 
             if ( $type eq 'collection' ) {
+
+                #print "Recursion! $collection->{attributes}{title}\n"
+                #if $col_id ne $collection->{attributes}{id};
+                my $recursion =
+                  $self->_retrieveID( $name, $type,
+                    $collection->{attributes}{id} )
+                  if $col_id ne $collection->{attributes}{id};
+                return $recursion if $recursion;
                 next unless $collection->{attributes}{title} eq $name;
                 return $collection->{attributes}{id};
             }
             else {
                 foreach my $set ( @{ $collection->{children} } ) {
-                    next unless $set->{name} && $set->{name} eq 'set';
-                    next unless $set->{attributes}{title} eq $name;
-                    return $set->{attributes}{id};
+                    next unless $set->{name};
+                    if ( $set->{name} eq 'collection' ) {
+
+                        #print "Recursion! $collection->{attributes}{title}\n"
+                        #if $col_id ne $collection->{attributes}{id};
+                        my $recursion =
+                          $self->_retrieveID( $name, $type,
+                            $collection->{attributes}{id} )
+                          if $col_id ne $collection->{attributes}{id};
+                        return $recursion if $recursion;
+                    }
+                    else {
+
+                        #print "Set: $set->{attributes}{title}\n";
+                        next unless $set->{attributes}{title} eq $name;
+                        return $set->{attributes}{id};
+                    }
                 }
             }
         }
@@ -481,4 +542,3 @@ sub _retrieveID {
 }
 
 1
-
