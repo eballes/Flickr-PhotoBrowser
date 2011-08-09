@@ -421,7 +421,7 @@ sub isTheWantedSize {
     );
 
     if ( $wishedSize eq 'url_o' ) {
-        return all { $_ > $dimensionMatrix{$wishedSize} } @$currentDimensions;
+        return any { $_ > $dimensionMatrix{$wishedSize} } @$currentDimensions;
     }
     else {
         return any { $_ == $dimensionMatrix{$wishedSize} } @$currentDimensions;
