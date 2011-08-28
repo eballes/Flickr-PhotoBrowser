@@ -23,7 +23,8 @@ WriteMakefile(
         'File::Path'     => 0,
         'LWP::Simple'    => 5.8,
         'Getopt::Long'   => 1,
-        'Flickr::API'    => 0.07
+        'Flickr::API'    => 0.07,
+        'Image::Size'    => 3.230,
     },
     'EXE_FILES' => ['bin/flickrBackup'],
     'clean'     => { FILES => 'ChangeLog META.yml' },
