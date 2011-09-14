@@ -79,7 +79,7 @@ sub backupSet {
     $safeTitle =~ s/\//-/g;
 
     my $path = "$basePath/$safeTitle";
-    print "Creating... $path\n";
+    print "Going into... $path\n";
     mkdir $path unless -e $path;
 
     my @photos = @{ $fpb->getPicturesOfSet( $set->{id}, $size, 1, [] ) };
@@ -97,7 +97,7 @@ sub backupCollection {
     $safeTitle =~ s/\//-/g;
 
     my $path = "$basePath/$safeTitle";
-    print "Creating... $path\n";
+    print "Going into... $path\n";
     mkdir $path unless -e $path;
 
     foreach my $element ( @{ $fpb->getCollections( $collection->{id} ) } ) {
@@ -270,7 +270,7 @@ Resume or incremental download can be considerably improved
 
 =head1 AUTHOR
 
-Eduardo Ballesteros, L<eebr@cpan.org>.
+Eduardo Ballesteros, L<eballes@gmail.com>.
 
 =head1 SEE ALSO
 
