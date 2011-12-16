@@ -67,25 +67,27 @@ sub url2file {
     {
         LWP::Simple::getstore( $flickrPhoto->{url},
             "$path/$flickrPhoto->{title}.$extension" );
-    } else { print "Skip download $flickrPhoto->{title}.$extension\n"}
+    }
+    else { print "Skip download $flickrPhoto->{title}.$extension\n" }
 
     return;
 }
 
 sub safeTitle {
     my ($title) = @_;
+
     #print "Unsafe title: $title\n";
 
     ( my $safeTitle = $title ) =~ s/&amp;/&/g;
     $safeTitle =~ s{/}{-}g;
 
-    #print "Safe title: $safeTitle\n"; 
+    #print "Safe title: $safeTitle\n";
     return $safeTitle;
 }
 
 sub backupSet {
     my ( $fpb, $basePath, $set, $size ) = @_;
-    my $safeTitle = safeTitle($set->{title});
+    my $safeTitle = safeTitle( $set->{title} );
 
     my $path = "$basePath/$safeTitle";
     print "Going into... $path\n";
@@ -101,7 +103,7 @@ sub backupSet {
 
 sub backupCollection {
     my ( $fpb, $basePath, $collection, $size ) = @_;
-    my $safeTitle = safeTitle($collection->{title});
+    my $safeTitle = safeTitle( $collection->{title} );
     my $dirtyFlag = 0;
 
     my $path = "$basePath/$safeTitle";
@@ -254,10 +256,6 @@ preferred for the backup. Options are:
 The C<--clean> flag indicates L<flickrBackup> to erase the output
 path passed by the C<--path> option. If this flag is not activated,
 a backup can be resumed.
-
-Warn: Just be careful. "Resume" means that the program is not downloading
-a file if it's already present e.g. no checks are made to consider if the
-size of the file present locally is the requested one.
 
 =item -h
 
