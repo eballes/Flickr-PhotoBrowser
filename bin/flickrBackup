@@ -72,19 +72,28 @@ sub url2file {
     return;
 }
 
+sub safeTitle {
+    my ($title) = @_;
+    #print "Unsafe title: $title\n";
+
+    ( my $safeTitle = $title ) =~ s/&amp;/&/g;
+    $safeTitle =~ s{/}{-}g;
+
+    #print "Safe title: $safeTitle\n"; 
+    return $safeTitle;
+}
+
 sub backupSet {
     my ( $fpb, $basePath, $set, $size ) = @_;
-
-    ( my $safeTitle = $set->{title} ) =~ s/([\(\)\'\s])/\\$1/g;
-    $safeTitle =~ s/\//-/g;
+    my $safeTitle = safeTitle($set->{title});
 
     my $path = "$basePath/$safeTitle";
     print "Going into... $path\n";
-    mkdir $path unless -e $path;
+    mkdir "$path" unless -e $path;
 
     my @photos = @{ $fpb->getPicturesOfSet( $set->{id}, $size, 1, [] ) };
     foreach my $photo (@photos) {
-        print "\tGetting photo... $photo->{title}\n";
+        print "\tGetting photo... $photo->{title}\r";
         url2file( $fpb, $photo, $path, $size );
     }
     return;
@@ -92,18 +101,19 @@ sub backupSet {
 
 sub backupCollection {
     my ( $fpb, $basePath, $collection, $size ) = @_;
-
-    ( my $safeTitle = $collection->{title} ) =~ s/([\(\)\'\s])/\\$1/g;
-    $safeTitle =~ s/\//-/g;
+    my $safeTitle = safeTitle($collection->{title});
+    my $dirtyFlag = 0;
 
     my $path = "$basePath/$safeTitle";
     print "Going into... $path\n";
-    mkdir $path unless -e $path;
+    mkdir "$path" unless -e $path;
 
     foreach my $element ( @{ $fpb->getCollections( $collection->{id} ) } ) {
+        $dirtyFlag = 1;
         backupCollection( $fpb, $path, $element, $size );
-        return;
     }
+
+    return if $dirtyFlag;
     foreach my $set ( @{ $fpb->getSetsOfCollections( $collection->{id} ) } ) {
         backupSet( $fpb, $path, $set, $size );
     }
